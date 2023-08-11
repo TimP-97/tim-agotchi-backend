@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const { faker } = require('@faker-js/faker');
 const { createRandomUser } = require('./utils');
 
+
 // import our models
 const { User, Post, Order, Product } = require('./models');
 
@@ -118,7 +119,7 @@ db.on('error', (err) => {
 //     if (post) {
 //         // find the comment by the id and remove
 //         post.comments.id('6493d5195db1f2b5fe7392b6').deleteOne()
-        
+
 //         post.save()
 //         .then(result => {
 //             console.log('removed comment', result);
@@ -131,31 +132,60 @@ db.on('error', (err) => {
 // .catch(error => console.log('error', error));
 
 // create a new order
-Order.create({
-    buyer: 'Issac',
-    trackingNumber: '384939xciosd02392',
-})
-.then(order => {
-    console.log('new order', order);
-    // add products to order
-    order.products.push('649747b45845267e021fedce', '649747b45845267e021fedc9');
-    // save the order
-    order.save()
-    .then(updatedOrder => {
-        console.log('order updated', updatedOrder);
-        // print the actual product inside order
-        updatedOrder.populate('products')
-        .then(result => {
-            console.log('order with products', result);
-        })
-        .catch(error => {
-            console.log(error);
-        })
-    })
-    .catch(error => {
-        console.log(error);
-    })
-})
-.catch(error => {
-    console.log(error);
-})
+// Order.create({
+//     buyer: 'Issac',
+//     trackingNumber: '384939xciosd02392',
+// })
+//     .then(order => {
+//         console.log('new order', order);
+//         // add products to order
+//         order.products.push('649747b45845267e021fedce', '649747b45845267e021fedc9');
+//         // save the order
+//         order.save()
+//             .then(updatedOrder => {
+//                 console.log('order updated', updatedOrder);
+//                 // print the actual product inside order
+//                 updatedOrder.populate('products')
+//                     .then(result => {
+//                         console.log('order with products', result);
+//                     })
+//                     .catch(error => {
+//                         console.log(error);
+//                     });
+//             })
+//             .catch(error => {
+//                 console.log(error);
+//             });
+//     })
+//     .catch(error => {
+//         console.log(error);
+//     });
+
+// const nodemailer = require("nodemailer");
+
+// const transporter = nodemailer.createTransport({
+//     service: 'Gmail',
+//     auth: {
+//         user: 'timagotchi.app@gmail.com',
+//         pass: process.env.EMAIL_APP_PASSWORD  // app password from your gmail account
+//     }
+// });
+
+// // async..await is not allowed in global scope, must use a wrapper
+// function main(toEmail, subject, message) {
+//     // send mail with defined transport object
+//     const mailOptions = {
+//         from: 'timagotchi.app@gmail.com', // sender address
+//         to: 'leejayjong@gmail.com', // list of receivers
+//         subject: 'new test', // Subject line
+//         html: 'testing', // html body
+//     };
+//     transporter.sendMail(mailOptions, (error, info) => {
+//         if (error) {
+//             return console.log(error);
+//         }
+//         console.log("Message sent: %s", info.messageId);
+//     });
+// }
+
+// main();

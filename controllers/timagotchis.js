@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const rateLimit = require('express-rate-limit');
 const cron = require('node-cron');
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET, EMAIL_APP_PASSWORD } = process.env;
 const { Timagotchi } = require('../models');
 
 const userAccess = {};
@@ -32,7 +32,7 @@ setInterval(async () => {
     } catch (error) {
         console.error('Error updating value:', error);
     }
-}, 1000); 
+}, 1000);
 
 //friendship status changing based on food and mood status 
 setInterval(async () => {
@@ -60,7 +60,7 @@ setInterval(async () => {
     } catch (error) {
         console.error('Error updating value:', error);
     }
-}, 1000); 
+}, 1000);
 
 //checking if alive 
 setInterval(async () => {
@@ -70,13 +70,13 @@ setInterval(async () => {
             let tim = tims[i];
             if (tim.food.value === 0 && tim.mood.value === 0) {
                 tim.alive = false;
-                tim.image = 'https://i.imgur.com/2En7QUb.png'
+                tim.image = 'https://i.imgur.com/2En7QUb.png';
             }
         }
     } catch (error) {
         console.error('Error updating value:', error);
     }
-}, 1000 * 60 * 60); 
+}, 1000 * 60 * 60);
 
 setInterval(async () => {
     try {
@@ -123,7 +123,7 @@ function checkFriendship(tim) {
         tim.image = 'https://i.imgur.com/PM51tMH.png';
     } else if (tim.type === 'Cat' && tim.friendship.value <= 20) {
         tim.friendship.staus = 'Enemies';
-        tim.image = 'https://i.imgur.com/kVqOjbT.png'
+        tim.image = 'https://i.imgur.com/kVqOjbT.png';
     } else if (tim.type === 'Dog' && tim.friendship.value >= 80) {
         tim.friendship.status = 'Best Friends';
         tim.image = 'https://i.imgur.com/FZucWaU.png';
@@ -166,7 +166,32 @@ function evenOut(tim) {
 //     },
 // });
 
+const nodemailer = require("nodemailer");
 
+const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'timagotchi.app@gmail.com',
+        pass: process.env.EMAIL_APP_PASSWORD  // app password from your gmail account
+    }
+});
+
+// async..await is not allowed in global scope, must use a wrapper
+function main(toEmail, subject, message) {
+    // send mail with defined transport object
+    const mailOptions = {
+        from: 'timagotchi.app@gmail.com', // sender address
+        to: toEmail, // list of receivers
+        subject: subject, // Subject line
+        html: message, // html body
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+        console.log("Message sent: %s", info.messageId);
+    });
+}
 
 //----------------------ROUTES----------------------//
 
@@ -231,16 +256,16 @@ router.post('/new', (req, res) => {
         gender: req.body.gender,
         user: req.body.user,
     })
-    .then((newTimagotchi) => {
-        console.log('new Timagotchi created =>', newTimagotchi);
-        return res.json({ timagotchi: newTimagotchi });
-    })
-    .catch((error) => {
-        console.log('error', error);
-        return res.json({ message: 'error occured, please try again.' });
+        .then((newTimagotchi) => {
+            console.log('new Timagotchi created =>', newTimagotchi);
+            return res.json({ timagotchi: newTimagotchi });
+        })
+        .catch((error) => {
+            console.log('error', error);
+            return res.json({ message: 'error occured, please try again.' });
 
-    });
-})
+        });
+});
 
 //delete a timagotchi
 router.delete('/:id', (req, res) => {
@@ -256,7 +281,7 @@ router.delete('/:id', (req, res) => {
             console.log('error', error);
             return res.json({ message: 'There was an issue, please try again' });
         });
-})
+});
 
 
 
@@ -321,7 +346,7 @@ router.put('/feed/:userId/:timId', async (req, res) => {
             return res.json({ message: 'There was an issue, please try again' });
         });
 
-})
+});
 
 router.put('/play/:userId/:timId', async (req, res) => {
     // const userKey = `${req.params.userId}:${req.params.timId}`;
@@ -351,7 +376,7 @@ router.put('/play/:userId/:timId', async (req, res) => {
             return res.json({ message: 'There was an issue, please try again' });
         });
 
-})
+});
 
 module.exports = router;
 
