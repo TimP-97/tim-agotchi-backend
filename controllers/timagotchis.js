@@ -184,15 +184,19 @@ router.get('/', (req, res) => {
 });
 
 //get all timagotchis for a specific user
-router.get('/my-timagotchis', async (req, res) => {
-    try {
-        const currentUser = req.query.userIds; 
-        const timagotchis = await Timagotchi.find({ user: { $in: currentUser } });
-        return res.json({ timagotchis });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'Server error' });
-    }
+router.get('/my-timagotchis/:userId', async (req, res) => {
+    Timagotchi.find({ user: req.params.userId })
+        .then(timagotchis => {
+            if (timagotchis) {
+                return res.json(timagotchis);
+            } else {
+                return res.json({ message: 'No Timagotchi Found' });
+            }
+        })
+        .catch(error => {
+            console.log('error', error);
+            return res.json({ message: 'There was an issue, please try again' });
+        });
 });
 
 //get a tim by userId and timId
