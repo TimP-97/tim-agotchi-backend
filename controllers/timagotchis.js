@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const rateLimit = require('express-rate-limit');
 const cron = require('node-cron');
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET, EMAIL_APP_PASSWORD } = process.env;
 const { Timagotchi } = require('../models');
 
 const userAccess = {};
@@ -105,7 +105,7 @@ function checkFriendship(tim) {
         tim.image = 'https://i.imgur.com/PM51tMH.png';
     } else if (tim.type === 'Cat' && tim.friendship.value <= 20) {
         tim.friendship.staus = 'Enemies';
-        tim.image = 'https://i.imgur.com/kVqOjbT.png'
+        tim.image = 'https://i.imgur.com/kVqOjbT.png';
     } else if (tim.type === 'Dog' && tim.friendship.value >= 80) {
         tim.friendship.status = 'Best Friends';
         tim.image = 'https://i.imgur.com/FZucWaU.png';
@@ -148,7 +148,32 @@ function evenOut(tim) {
 //     },
 // });
 
+const nodemailer = require("nodemailer");
 
+const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'timagotchi.app@gmail.com',
+        pass: process.env.EMAIL_APP_PASSWORD  // app password from your gmail account
+    }
+});
+
+// async..await is not allowed in global scope, must use a wrapper
+function main(toEmail, subject, message) {
+    // send mail with defined transport object
+    const mailOptions = {
+        from: 'timagotchi.app@gmail.com', // sender address
+        to: toEmail, // list of receivers
+        subject: subject, // Subject line
+        html: message, // html body
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+        console.log("Message sent: %s", info.messageId);
+    });
+}
 
 //----------------------ROUTES----------------------//
 
